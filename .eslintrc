@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "eslint-config-poetez",
+    "plugin:prettier/recommended",
+    "eslint-config-prettier"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "callback-return": "off",
+    "no-unused-expressions": "off",
+    "prefer-rest-params": "off"
+  }
+}
