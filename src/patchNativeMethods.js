@@ -42,6 +42,14 @@ function patchNativeMethods() {
     return element;
   };
 
+  const {attachShadow} = HTMLElement.prototype;
+  HTMLElement.prototype.attachShadow = function() {
+    const root = attachShadow.apply(this, arguments);
+    createElementObserver(root);
+
+    return root;
+  };
+
   wrap(Document.prototype, 'importNode');
   wrap(Node.prototype, 'cloneNode');
 }
