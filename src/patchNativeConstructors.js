@@ -1,5 +1,6 @@
 import {
   $attributeChangedCallback,
+  defineProperty,
   elementsReversedRegistry,
   nativeConstructorNames,
   nativeConstructorRegistry,
@@ -8,7 +9,7 @@ import {
   upgradingRegistry,
 } from './shared';
 
-const attributeChanged = mutations => {
+function attributeChanged(mutations) {
   for (let i = 0, len = mutations.length; i < len; i++) {
     const {attributeName, oldValue, target} = mutations[i];
 
@@ -20,17 +21,13 @@ const attributeChanged = mutations => {
       );
     }
   }
-};
+}
 
-const patchNativeConstructors = () => {
-  for (let i = 0, len = nativeConstructorNames.length; i < len; i++) {
-    const NativeConstructor = window[nativeConstructorNames[i]];
+function patchNativeConstructors() {
+  nativeConstructorNames.forEach(nativeConstructorName => {
+    const NativeConstructor = window[nativeConstructorName];
 
     class PolyfilledConstructor {
-      static [Symbol.hasInstance](instance) {
-        return instance instanceof NativeConstructor;
-      }
-
       constructor() {
         const {constructor} = this;
 
@@ -74,10 +71,17 @@ const patchNativeConstructors = () => {
       }
     }
 
+    defineProperty(PolyfilledConstructor, Symbol.hasInstance, {
+      configurable: true,
+      value(instance) {
+        return instance instanceof NativeConstructor;
+      },
+    });
+
     nativeConstructorRegistry.set(PolyfilledConstructor, NativeConstructor);
 
-    window[nativeConstructorNames[i]] = PolyfilledConstructor;
-  }
-};
+    window[nativeConstructorName] = PolyfilledConstructor;
+  });
+}
 
 export default patchNativeConstructors;

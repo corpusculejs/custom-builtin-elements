@@ -6,13 +6,13 @@ import {
   patchedPrototypesRegistry,
   setPrototypeOf,
 } from './shared';
-import {setup, setupAndConnect} from './upgrade';
-import {getPrototypeChain, recognizeElement, runForDescendants} from './utils';
+import {recognizeElement, setup, setupAndConnect} from './upgrade';
+import {getPrototypeChain, runForDescendants} from './utils';
 
 const CERExceptionCommonText =
   "Failed to execute 'define' on 'CustomElementRegistry':";
 
-const patchCustomElementsRegistry = () => {
+function patchCustomElementsRegistry() {
   const {define, get, upgrade, whenDefined} = customElements;
 
   defineProperties(customElements, {
@@ -90,6 +90,6 @@ const patchCustomElementsRegistry = () => {
       },
     },
   });
-};
+}
 
 export default patchCustomElementsRegistry;

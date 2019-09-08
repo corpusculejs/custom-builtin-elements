@@ -1,21 +1,27 @@
 import {
   $connectedCallback,
   $disconnectedCallback,
+  elementsRegistry,
   lifecycleRegistry,
   upgradedElementsRegistry,
   upgradingRegistry,
 } from './shared';
-import {recognizeElement} from './utils';
 
-export const setup = (element, constructor) => {
+export function recognizeElement(element) {
+  const name = element.getAttribute('is');
+
+  return name && elementsRegistry[name];
+}
+
+export function setup(element, constructor) {
   if (!upgradedElementsRegistry.has(element)) {
     upgradingRegistry.set(constructor, element);
     new constructor(); // eslint-disable-line no-new
     upgradedElementsRegistry.add(element);
   }
-};
+}
 
-export const setupAndConnect = element => {
+export function setupAndConnect(element) {
   const constructor = recognizeElement(element);
 
   if (constructor) {
@@ -30,9 +36,9 @@ export const setupAndConnect = element => {
       lifecycleRegistry.set(element, $connectedCallback);
     }
   }
-};
+}
 
-export const disconnect = element => {
+export function disconnect(element) {
   const constructor = recognizeElement(element);
 
   if (
@@ -43,4 +49,4 @@ export const disconnect = element => {
     element[$disconnectedCallback]();
     lifecycleRegistry.set(element, $disconnectedCallback);
   }
-};
+}

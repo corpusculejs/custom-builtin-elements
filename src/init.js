@@ -3,12 +3,12 @@ import patchNativeConstructors from './patchNativeConstructors';
 import patchNativeMethods from './patchNativeMethods';
 import {createElementObserver} from './utils';
 
-export const initObservation = () => {
+export function initObservation() {
   createElementObserver(document.body);
-};
+}
 
-export const initPolyfill = () => {
+export function initPolyfill() {
   patchNativeConstructors();
   patchCustomElementsRegistry();
   patchNativeMethods();
-};
+}
