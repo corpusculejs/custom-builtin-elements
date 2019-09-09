@@ -6,7 +6,7 @@
 export default function detect() {
   try {
     customElements.define(
-      'corpuscule-detector',
+      'corpuscule-custom-builtin-elements-detector',
       document.createElement('p').constructor,
       {extends: 'p'},
     );
