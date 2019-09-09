@@ -16,4 +16,5 @@ module.exports = {
       comments: 'none',
     }),
   ],
+  treeshake: false,
 };
