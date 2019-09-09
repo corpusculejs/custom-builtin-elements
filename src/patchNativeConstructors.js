@@ -1,13 +1,12 @@
 import {
   $attributeChangedCallback,
-  defineProperty,
   elementsReversedRegistry,
   nativeConstructorNames,
   nativeConstructorRegistry,
-  setPrototypeOf,
   tagsRegistry,
   upgradingRegistry,
 } from './shared';
+import {defineProperty, setPrototypeOf} from './utils';
 
 function attributeChanged(mutations) {
   for (let i = 0, len = mutations.length; i < len; i++) {

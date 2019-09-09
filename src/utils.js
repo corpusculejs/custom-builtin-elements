@@ -1,5 +1,13 @@
-import {getPrototypeOf, observerRegistry} from './shared';
+import {supportsNativeWebComponents} from './shared';
 import {disconnect, setupAndConnect} from './upgrade';
+
+export const {
+  defineProperties,
+  defineProperty,
+  getOwnPropertyDescriptor,
+  getPrototypeOf,
+  setPrototypeOf,
+} = Object;
 
 export function getPrototypeChain(proto) {
   const chain = [proto];
@@ -9,7 +17,7 @@ export function getPrototypeChain(proto) {
   while (true) {
     currentProto = getPrototypeOf(currentProto);
 
-    if (currentProto === HTMLElement.prototype) {
+    if (currentProto === Object.prototype) {
       return chain;
     }
 
@@ -29,12 +37,15 @@ export function isCheck(node) {
  * @param {function(node: Node): boolean} check the function that checks if the
  * node meets the criteria.
  * @param {function(node: Node): void} callback the callback to run.
+ * @param {Boolean} pierce an option that describes if the shadow boundaries
+ * should be pierced while iterating.
  */
-export function runForDescendants(root, check, callback) {
+export function runForDescendants(root, check, callback, pierce = false) {
   const iter = document.createNodeIterator(
     root,
     NodeFilter.SHOW_ELEMENT,
-    node => check(node) || node.shadowRoot,
+    node =>
+      check(node) || (pierce && supportsNativeWebComponents && node.shadowRoot),
     null,
     false,
   );
@@ -42,45 +53,52 @@ export function runForDescendants(root, check, callback) {
   let node;
 
   while ((node = iter.nextNode())) {
-    if (node.shadowRoot) {
-      runForDescendants(node.shadowRoot, check, callback);
+    if (supportsNativeWebComponents && pierce && node.shadowRoot) {
+      runForDescendants(node.shadowRoot, check, callback, pierce);
     } else {
       callback(node);
     }
   }
 }
 
-export function watchElementsChanges(mutations) {
+function watchDOMChanges(mutations) {
   for (let i = 0, iLen = mutations.length; i < iLen; i++) {
     const {addedNodes, removedNodes} = mutations[i];
     for (let j = 0, jLen = addedNodes.length; j < jLen; j++) {
-      runForDescendants(addedNodes[j], isCheck, setupAndConnect);
-
-      // When our element is connected to the DOM, it is not necessary to
-      // continue watching it: the parent element will do it for us. So we just
-      // disconnect the element observer.
-      observerRegistry.get(addedNodes[j])?.disconnect();
+      runForDescendants(addedNodes[j], isCheck, setupAndConnect, true);
     }
 
     for (let j = 0, jLen = removedNodes.length; j < jLen; j++) {
-      runForDescendants(removedNodes[j], isCheck, disconnect);
-
-      // When our element is removed, we still can change it, so we need to
-      // observe it again.
-      observerRegistry.get(removedNodes[j])?.observe();
+      runForDescendants(removedNodes[j], isCheck, disconnect, true);
     }
   }
 }
 
 export function createElementObserver(element) {
-  const observer = new MutationObserver(watchElementsChanges);
-  const observingTool = {
-    disconnect() {
-      observer.disconnect();
-    },
-    observe() {
-      observer.observe(element, {childList: true, subtree: true});
-    },
-  };
-  observerRegistry.set(element, observingTool);
+  const observer = new MutationObserver(watchDOMChanges);
+  observer.observe(element, {childList: true, subtree: true});
+}
+
+export function isConnected(element) {
+  return 'isConnected' in element
+    ? element.isConnected
+    : document.body.contains(element);
+}
+
+export function isConnectedToObservingNode(element) {
+  if (isConnected(element)) {
+    return true;
+  }
+
+  let node = element;
+
+  while (node) {
+    if (node.parentNode.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+      return true;
+    }
+
+    node = node.parentNode;
+  }
+
+  return false;
 }

@@ -1,3 +1,7 @@
+export const supportsNativeWebComponents =
+  'ShadowRoot' in window &&
+  !('ShadyCSS' in window && !window.ShadyCSS.nativeShadow);
+
 /**
  * Customized built-in elements registry. Contains "name => constructor"
  * associations.
@@ -71,12 +75,7 @@ export const upgradedElementsRegistry = new WeakSet();
  */
 export const lifecycleRegistry = new WeakMap();
 
-/**
- * A registry that contains all temporary observers for non-connected elements.
- *
- * @type {WeakMap<Node, object>}
- */
-export const observerRegistry = new WeakMap();
+export const isPattern = /\bis=(["'])?[a-z0-9_-]+\1/i;
 
 export const $attributeChangedCallback = 'attributeChangedCallback';
 export const $connectedCallback = 'connectedCallback';
@@ -146,10 +145,3 @@ export const nativeConstructorNames = [
   'HTMLUListElement',
   'HTMLVideoElement',
 ];
-
-export const {
-  defineProperties,
-  defineProperty,
-  getPrototypeOf,
-  setPrototypeOf,
-} = Object;

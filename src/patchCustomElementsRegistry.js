@@ -1,16 +1,21 @@
 import {
-  defineProperties,
   elementsRegistry,
   elementsReversedRegistry,
   nativeConstructorRegistry,
   patchedPrototypesRegistry,
-  setPrototypeOf,
 } from './shared';
 import {recognizeElement, setup, setupAndConnect} from './upgrade';
-import {getPrototypeChain, runForDescendants} from './utils';
+import {
+  defineProperties,
+  getPrototypeChain,
+  runForDescendants,
+  setPrototypeOf,
+} from './utils';
 
 const CERExceptionCommonText =
-  "Failed to execute 'define' on 'CustomElementRegistry':";
+  "Failed to execute 'define' on 'CustomElementRegistry'";
+
+const dashPattern = /-/;
 
 function patchCustomElementsRegistry() {
   const {define, get, upgrade, whenDefined} = customElements;
@@ -27,19 +32,25 @@ function patchCustomElementsRegistry() {
 
         if (name in elementsRegistry) {
           throw new Error(
-            `${CERExceptionCommonText} the name "${name}" has already been used with this registry`,
+            `${CERExceptionCommonText}: the name "${name}" has already been used with this registry`,
           );
         }
 
         if (elementsReversedRegistry.has(constructor)) {
           throw new Error(
-            `${CERExceptionCommonText} this constructor has already been used with this registry`,
+            `${CERExceptionCommonText}: this constructor has already been used with this registry`,
+          );
+        }
+
+        if (!dashPattern.test(name)) {
+          throw new Error(
+            `${CERExceptionCommonText}: "${name}" is not a valid custom element name`,
           );
         }
 
         const chain = getPrototypeChain(constructor.prototype);
-        const polyfilledPrototype = chain[chain - 1];
-        const firstChild = chain[chain - 2];
+        const polyfilledPrototype = chain[chain.length - 1];
+        const firstChild = chain[chain.length - 2];
 
         const nativeConstructor = nativeConstructorRegistry.get(
           polyfilledPrototype.constructor,

@@ -6,6 +6,7 @@ import {
   upgradedElementsRegistry,
   upgradingRegistry,
 } from './shared';
+import {isConnected} from './utils';
 
 export function recognizeElement(element) {
   const name = element.getAttribute('is');
@@ -28,7 +29,7 @@ export function setupAndConnect(element) {
     setup(element, constructor);
 
     if (
-      element.isConnected &&
+      isConnected(element) &&
       $connectedCallback in element &&
       lifecycleRegistry.get(element) !== $connectedCallback
     ) {

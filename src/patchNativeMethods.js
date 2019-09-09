@@ -1,8 +1,19 @@
-import {elementsRegistry} from './shared';
-import {setupAndConnect} from './upgrade';
-import {createElementObserver, isCheck, runForDescendants} from './utils';
+import {
+  elementsRegistry,
+  isPattern,
+  supportsNativeWebComponents,
+} from './shared';
+import {setup} from './upgrade';
+import {
+  createElementObserver,
+  defineProperty,
+  getOwnPropertyDescriptor,
+  isCheck,
+  isConnectedToObservingNode,
+  runForDescendants,
+} from './utils';
 
-function wrap(proto, name) {
+function patch(proto, name) {
   const nativeMethod = proto[name];
 
   proto[name] = function() {
@@ -12,10 +23,7 @@ function wrap(proto, name) {
       result.nodeType === Node.ELEMENT_NODE ||
       result.nodeType === Node.DOCUMENT_FRAGMENT_NODE
     ) {
-      const body = result.content || result;
-
-      runForDescendants(body, isCheck, setupAndConnect);
-      createElementObserver(body);
+      runForDescendants(result.content || result, isCheck, setup);
     }
   };
 }
@@ -23,35 +31,47 @@ function wrap(proto, name) {
 function patchNativeMethods() {
   const {createElement} = document;
   document.createElement = function(_, options) {
-    let element;
-
-    if (options && options.is) {
-      const constructor = elementsRegistry[options.is];
-
-      if (constructor) {
-        element = new constructor();
-      }
-    } else {
-      element = createElement.apply(document, arguments);
+    if (options && options.is && elementsRegistry[options.is]) {
+      return new elementsRegistry[options.is]();
     }
 
-    // We need to upgrade non-connected elements and their internal tree, so
-    // we add the MutationObserver to perform it.
-    createElementObserver(element.content || element);
-
-    return element;
+    return createElement.apply(document, arguments);
   };
 
-  const {attachShadow} = HTMLElement.prototype;
-  HTMLElement.prototype.attachShadow = function() {
-    const root = attachShadow.apply(this, arguments);
-    createElementObserver(root);
+  if (supportsNativeWebComponents) {
+    const {attachShadow} = HTMLElement.prototype;
+    HTMLElement.prototype.attachShadow = function() {
+      const root = attachShadow.apply(this, arguments);
+      createElementObserver(root);
 
-    return root;
+      return root;
+    };
+  }
+
+  patch(Document.prototype, 'importNode');
+  patch(Node.prototype, 'cloneNode');
+
+  const {insertAdjacentHTML} = Element.prototype;
+  Element.prototype.insertAdjacentHTML = function(_, html) {
+    insertAdjacentHTML.apply(this, arguments);
+
+    if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
+      runForDescendants(this, isCheck, setup);
+    }
   };
 
-  wrap(Document.prototype, 'importNode');
-  wrap(Node.prototype, 'cloneNode');
+  const {get, set} = getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  defineProperty(Element.prototype, 'innerHTML', {
+    configurable: true,
+    get,
+    set(html) {
+      set.call(this, html);
+
+      if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
+        runForDescendants(this, isCheck, setup);
+      }
+    },
+  });
 }
 
 export default patchNativeMethods;
