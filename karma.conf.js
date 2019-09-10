@@ -44,7 +44,7 @@ module.exports = config => {
 
     preprocessors: {
       '__tests__/polyfills.js': ['rollup'],
-      'lib/customBuiltInElementsPolyfill.js': ['babel'],
+      'lib/customBuiltInElementsPolyfill.js': coverage ? ['babel'] : [],
       '__tests__/index.js': ['rollup'],
     },
 
@@ -75,7 +75,7 @@ module.exports = config => {
     detectBrowsers: {
       postDetection(availableBrowsers) {
         return availableBrowsers.filter(
-          browser => browser !== 'FirefoxHeadless' && browser !== 'IE', // && browser !== 'Edge',
+          browser => browser !== 'FirefoxHeadless' && browser !== 'Edge', // && browser !== 'IE',
         );
       },
       preferHeadless: true,
@@ -91,7 +91,7 @@ module.exports = config => {
         require('rollup-plugin-node-resolve')(),
         require('rollup-plugin-babel')({
           babelrc: false,
-          include: ['node_modules/@open-wc/**', 'test/**'],
+          include: ['node_modules/@open-wc/**', '__tests__/**'],
           ...babelrc,
           plugins: [
             '@babel/plugin-transform-instanceof',

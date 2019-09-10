@@ -14,6 +14,7 @@
     "callback-return": "off",
     "func-names": "off",
     "max-classes-per-file": "off",
+    "no-empty-function": "off",
     "no-unused-expressions": "off",
     "prefer-rest-params": "off"
   }
