@@ -3,7 +3,6 @@ import {
   isPattern,
   supportsNativeWebComponents,
 } from './shared';
-import {setup} from './upgrade';
 import {
   createElementObserver,
   defineProperty,
@@ -11,6 +10,7 @@ import {
   isCheck,
   isConnectedToObservingNode,
   runForDescendants,
+  setup,
 } from './utils';
 
 function patch(proto, name) {
@@ -52,7 +52,7 @@ function patchNativeMethods() {
   patch(Node.prototype, 'cloneNode');
 
   const {insertAdjacentHTML} = Element.prototype;
-  Element.prototype.insertAdjacentHTML = function(_, html) {
+  HTMLElement.prototype.insertAdjacentHTML = function(_, html) {
     insertAdjacentHTML.apply(this, arguments);
 
     if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
@@ -60,7 +60,10 @@ function patchNativeMethods() {
     }
   };
 
-  const {get, set} = getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  const {get, set} = getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'innerHTML',
+  );
   defineProperty(Element.prototype, 'innerHTML', {
     configurable: true,
     get,

@@ -4,12 +4,14 @@ import {
   nativeConstructorRegistry,
   patchedPrototypesRegistry,
 } from './shared';
-import {recognizeElement, setup, setupAndConnect} from './upgrade';
 import {
   defineProperties,
   getPrototypeChain,
+  recognizeElement,
   runForDescendants,
   setPrototypeOf,
+  setup,
+  setupAndConnect,
 } from './utils';
 
 const CERExceptionCommonText =
@@ -59,6 +61,11 @@ function patchCustomElementsRegistry() {
         if (!patchedPrototypesRegistry.has(firstChild)) {
           setPrototypeOf(firstChild, nativeConstructor.prototype);
           patchedPrototypesRegistry.add(firstChild);
+
+          Object.defineProperty(firstChild.constructor, Symbol.hasInstance, {
+            configurable: true,
+            value: null,
+          });
         }
 
         elementsRegistry[name] = constructor;

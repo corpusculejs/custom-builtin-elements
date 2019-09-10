@@ -1,1 +1,2 @@
 import './creation';
+import './registry';

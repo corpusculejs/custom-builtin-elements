@@ -41,7 +41,7 @@ function patchNativeConstructors() {
           // customized built-in element.
 
           element = upgradingRegistry.get(constructor);
-          upgradingRegistry.remove(constructor);
+          upgradingRegistry.delete(constructor);
         } else {
           // Creation mode. The new element will be created.
 

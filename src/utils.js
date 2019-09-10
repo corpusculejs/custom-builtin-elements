@@ -1,5 +1,12 @@
-import {supportsNativeWebComponents} from './shared';
-import {disconnect, setupAndConnect} from './upgrade';
+import {
+  $connectedCallback,
+  $disconnectedCallback,
+  elementsRegistry,
+  lifecycleRegistry,
+  supportsNativeWebComponents,
+  upgradedElementsRegistry,
+  upgradingRegistry,
+} from './shared';
 
 export const {
   defineProperties,
@@ -27,6 +34,12 @@ export function getPrototypeChain(proto) {
 
 export function isCheck(node) {
   return node.hasAttribute('is');
+}
+
+export function isConnected(element) {
+  return 'isConnected' in element
+    ? element.isConnected
+    : document.body.contains(element);
 }
 
 /**
@@ -61,6 +74,50 @@ export function runForDescendants(root, check, callback, pierce = false) {
   }
 }
 
+export function recognizeElement(element) {
+  const name = element.getAttribute('is');
+
+  return name && elementsRegistry[name];
+}
+
+export function setup(element, constructor) {
+  if (!upgradedElementsRegistry.has(element)) {
+    upgradingRegistry.set(constructor, element);
+    new constructor(); // eslint-disable-line no-new
+    upgradedElementsRegistry.add(element);
+  }
+}
+
+export function setupAndConnect(element) {
+  const constructor = recognizeElement(element);
+
+  if (constructor) {
+    setup(element, constructor);
+
+    if (
+      isConnected(element) &&
+      $connectedCallback in element &&
+      lifecycleRegistry.get(element) !== $connectedCallback
+    ) {
+      element[$connectedCallback]();
+      lifecycleRegistry.set(element, $connectedCallback);
+    }
+  }
+}
+
+export function disconnect(element) {
+  const constructor = recognizeElement(element);
+
+  if (
+    constructor &&
+    $disconnectedCallback in element &&
+    lifecycleRegistry.get(element) !== $disconnectedCallback
+  ) {
+    element[$disconnectedCallback]();
+    lifecycleRegistry.set(element, $disconnectedCallback);
+  }
+}
+
 function watchDOMChanges(mutations) {
   for (let i = 0, iLen = mutations.length; i < iLen; i++) {
     const {addedNodes, removedNodes} = mutations[i];
@@ -79,12 +136,6 @@ export function createElementObserver(element) {
   observer.observe(element, {childList: true, subtree: true});
 }
 
-export function isConnected(element) {
-  return 'isConnected' in element
-    ? element.isConnected
-    : document.body.contains(element);
-}
-
 export function isConnectedToObservingNode(element) {
   if (isConnected(element)) {
     return true;
@@ -93,7 +144,7 @@ export function isConnectedToObservingNode(element) {
   let node = element;
 
   while (node) {
-    if (node.parentNode.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+    if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
       return true;
     }
 
