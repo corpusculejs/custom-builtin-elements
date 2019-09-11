@@ -7,8 +7,8 @@ import {
   createElementObserver,
   defineProperty,
   getOwnPropertyDescriptor,
-  isCheck,
   isConnectedToObservingNode,
+  recognizeElement,
   runForDescendants,
   setup,
 } from './utils';
@@ -23,7 +23,7 @@ function patch(proto, name) {
       result.nodeType === Node.ELEMENT_NODE ||
       result.nodeType === Node.DOCUMENT_FRAGMENT_NODE
     ) {
-      runForDescendants(result.content || result, isCheck, setup);
+      runForDescendants(result.content || result, recognizeElement, setup);
     }
   };
 }
@@ -51,27 +51,29 @@ function patchNativeMethods() {
   patch(Document.prototype, 'importNode');
   patch(Node.prototype, 'cloneNode');
 
-  const {insertAdjacentHTML} = Element.prototype;
-  HTMLElement.prototype.insertAdjacentHTML = function(_, html) {
+  const proto =
+    'innerHTML' in Element.prototype
+      ? Element.prototype
+      : HTMLElement.prototype;
+
+  const {insertAdjacentHTML} = proto;
+  proto.insertAdjacentHTML = function(_, html) {
     insertAdjacentHTML.apply(this, arguments);
 
     if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
-      runForDescendants(this, isCheck, setup);
+      runForDescendants(this, recognizeElement, setup);
     }
   };
 
-  const {get, set} = getOwnPropertyDescriptor(
-    HTMLElement.prototype,
-    'innerHTML',
-  );
-  defineProperty(Element.prototype, 'innerHTML', {
+  const {get, set} = getOwnPropertyDescriptor(proto, 'innerHTML');
+  defineProperty(proto, 'innerHTML', {
     configurable: true,
     get,
     set(html) {
       set.call(this, html);
 
       if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
-        runForDescendants(this, isCheck, setup);
+        runForDescendants(this, recognizeElement, setup);
       }
     },
   });

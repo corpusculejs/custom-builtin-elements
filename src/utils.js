@@ -32,15 +32,14 @@ export function getPrototypeChain(proto) {
   }
 }
 
-export function isCheck(node) {
-  return node.hasAttribute('is');
-}
-
 export function isConnected(element) {
   return 'isConnected' in element
     ? element.isConnected
     : document.body.contains(element);
 }
+
+const checkShadow = (node, pierce) =>
+  supportsNativeWebComponents && pierce && node.shadowRoot;
 
 /**
  * This function runs callback for all nodes that meets the criteria provided by
@@ -58,7 +57,9 @@ export function runForDescendants(root, check, callback, pierce = false) {
     root,
     NodeFilter.SHOW_ELEMENT,
     node =>
-      check(node) || (pierce && supportsNativeWebComponents && node.shadowRoot),
+      check(node) || checkShadow(node, pierce)
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT,
     null,
     false,
   );
@@ -66,7 +67,7 @@ export function runForDescendants(root, check, callback, pierce = false) {
   let node;
 
   while ((node = iter.nextNode())) {
-    if (supportsNativeWebComponents && pierce && node.shadowRoot) {
+    if (checkShadow(node, pierce)) {
       runForDescendants(node.shadowRoot, check, callback, pierce);
     } else {
       callback(node);
@@ -122,11 +123,11 @@ function watchDOMChanges(mutations) {
   for (let i = 0, iLen = mutations.length; i < iLen; i++) {
     const {addedNodes, removedNodes} = mutations[i];
     for (let j = 0, jLen = addedNodes.length; j < jLen; j++) {
-      runForDescendants(addedNodes[j], isCheck, setupAndConnect, true);
+      runForDescendants(addedNodes[j], recognizeElement, setupAndConnect, true);
     }
 
     for (let j = 0, jLen = removedNodes.length; j < jLen; j++) {
-      runForDescendants(removedNodes[j], isCheck, disconnect, true);
+      runForDescendants(removedNodes[j], recognizeElement, disconnect, true);
     }
   }
 }

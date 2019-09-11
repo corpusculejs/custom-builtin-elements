@@ -1,70 +1,123 @@
+import {defineCE} from '@open-wc/testing-helpers/src/helpers';
 import {defineCBE, generateName} from './defineCBE';
 
+const isPolyfill = HTMLButtonElement.name !== 'HTMLButtonElement';
+
 describe('custom-builtin-elements-polyfill', () => {
-  describe('registry', () => {
-    it('throws an error if there is attempt to add two elements with the same name', () => {
-      class A extends HTMLButtonElement {}
-      const name = defineCBE(A, 'button');
+  describe('CustomElementsRegistry', () => {
+    describe('define', () => {
+      it('throws an error if there is attempt to add two elements with the same name', () => {
+        class Foo extends HTMLButtonElement {}
+        const name = defineCBE(Foo, 'button');
 
-      class B extends HTMLButtonElement {}
+        class Bar extends HTMLButtonElement {}
 
-      expect(() =>
-        customElements.define(name, B, {extends: 'button'}),
-      ).toThrowError(
-        `Failed to execute 'define' on 'CustomElementRegistry': the name "${name}" has already been used with this registry`,
-      );
+        expect(() =>
+          customElements.define(name, Bar, {extends: 'button'}),
+        ).toThrowError(
+          `Failed to execute 'define' on 'CustomElementRegistry': the name "${name}" has already been used with this registry`,
+        );
+      });
+
+      it('throws an error if there is attempt to add single element with two names', () => {
+        class Foo extends HTMLButtonElement {}
+        defineCBE(Foo, 'button');
+
+        expect(() => defineCBE(Foo, 'button')).toThrowError(
+          "Failed to execute 'define' on 'CustomElementRegistry': this constructor has already been used with this registry",
+        );
+      });
+
+      it('throws an error if the element name does not have dash symbol', () => {
+        class Foo extends HTMLButtonElement {}
+
+        expect(() =>
+          customElements.define('foo', Foo, {extends: 'button'}),
+        ).toThrowError(
+          "Failed to execute 'define' on 'CustomElementRegistry': \"foo\" is not a valid custom element name",
+        );
+      });
+
+      it('uses the native method if no options provided', () => {
+        if (!isPolyfill) {
+          pending();
+        }
+
+        class Foo {}
+        expect(() => defineCE(Foo)).toThrowError(
+          'Not supported in this environment',
+        );
+      });
     });
 
-    it('throws an error if there is attempt to add single element with two names', () => {
-      class A extends HTMLButtonElement {}
-      defineCBE(A, 'button');
+    describe('get', () => {
+      it('gets constructor by name', () => {
+        class Foo extends HTMLButtonElement {}
+        const name = defineCBE(Foo, 'button');
 
-      expect(() => defineCBE(A, 'button')).toThrowError(
-        "Failed to execute 'define' on 'CustomElementRegistry': this constructor has already been used with this registry",
-      );
+        const constructor = customElements.get(name);
+        expect(constructor).toBe(Foo);
+      });
+
+      it('runs native method if if the element is not recognized', () => {
+        if (!isPolyfill) {
+          pending();
+        }
+
+        expect(() => customElements.get('x-foo')).toThrowError(
+          'Not supported in this environment',
+        );
+      });
     });
 
-    it('throws an error if the element name does not have dash symbol', () => {
-      class A extends HTMLButtonElement {}
+    describe('upgrade', () => {
+      it('upgrades the element', () => {
+        const name = generateName();
+        const div = document.createElement('div');
+        div.innerHTML = `<button is="${name}"></button>`;
 
-      expect(() =>
-        customElements.define('foo', A, {extends: 'button'}),
-      ).toThrowError(
-        "Failed to execute 'define' on 'CustomElementRegistry': \"foo\" is not a valid custom element name",
-      );
+        // eslint-disable-next-line prefer-destructuring
+        const buttonToUpgrade = div.children[0];
+
+        class Foo extends HTMLButtonElement {}
+        customElements.define(name, Foo, {extends: 'button'});
+
+        expect(buttonToUpgrade instanceof Foo).not.toBeTruthy();
+
+        customElements.upgrade(buttonToUpgrade);
+
+        expect(buttonToUpgrade instanceof Foo).toBeTruthy();
+      });
+
+      it('uses the native method if the element is not recognized', () => {
+        if (!isPolyfill) {
+          pending();
+        }
+
+        const foo = document.createElement('x-foo');
+        expect(() => customElements.upgrade(foo)).toThrowError(
+          'Not supported in this environment',
+        );
+      });
     });
 
-    it('gets constructor by name', () => {
-      class A extends HTMLButtonElement {}
-      const name = defineCBE(A, 'button');
+    describe('whenDefined', () => {
+      it('waits until the component is defined', done => {
+        class Foo extends HTMLButtonElement {}
+        const name = defineCBE(Foo, 'button');
 
-      const constructor = customElements.get(name);
-      expect(constructor).toBe(A);
-    });
+        customElements.whenDefined(name).then(done);
+      });
 
-    it('upgrades the element', () => {
-      const name = generateName();
-      const div = document.createElement('div');
-      div.innerHTML = `<button is="${name}"></button>`;
+      it('uses the native method if the element is not recognized', () => {
+        if (!isPolyfill) {
+          pending();
+        }
 
-      // eslint-disable-next-line prefer-destructuring
-      const buttonToUpgrade = div.children[0];
-
-      class A extends HTMLButtonElement {}
-      customElements.define(name, A, {extends: 'button'});
-
-      expect(buttonToUpgrade instanceof A).not.toBeTruthy();
-
-      customElements.upgrade(buttonToUpgrade);
-
-      expect(buttonToUpgrade instanceof A).toBeTruthy();
-    });
-
-    it('waits until the component is defined', done => {
-      class A extends HTMLButtonElement {}
-      const name = defineCBE(A, 'button');
-
-      customElements.whenDefined(name).then(done);
+        expect(() => customElements.whenDefined('x-foo')).toThrowError(
+          'Not supported in this environment',
+        );
+      });
     });
   });
 });
