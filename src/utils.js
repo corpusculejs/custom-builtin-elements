@@ -5,7 +5,6 @@ import {
   elementsReversedRegistry,
   lifecycleRegistry,
   supportsNativeWebComponents,
-  upgradedElementsRegistry,
   upgradingRegistry,
 } from './shared';
 
@@ -91,12 +90,8 @@ export function recognizeElementByConstructor({constructor}) {
 
 export function setup(element) {
   const constructor = recognizeElementByIsAttribute(element);
-
-  if (!upgradedElementsRegistry.has(element)) {
-    upgradingRegistry.set(constructor, element);
-    new constructor(); // eslint-disable-line no-new
-    upgradedElementsRegistry.add(element);
-  }
+  upgradingRegistry.set(constructor, element);
+  new constructor(); // eslint-disable-line no-new
 }
 
 export function connect(element) {

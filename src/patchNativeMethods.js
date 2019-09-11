@@ -28,6 +28,8 @@ function patch(proto, name) {
         setup,
       );
     }
+
+    return result;
   };
 }
 

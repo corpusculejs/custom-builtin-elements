@@ -61,14 +61,6 @@ export const nativeConstructorRegistry = new WeakMap();
 export const patchedPrototypesRegistry = new WeakSet();
 
 /**
- * A registry that contains already upgraded element to prevent repeated
- * upgrade.
- *
- * @type {WeakSet<object>}
- */
-export const upgradedElementsRegistry = new WeakSet();
-
-/**
  * A registry that contains the current connection state of the specific element.
  *
  * @type {WeakMap<Element, string>}
