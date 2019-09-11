@@ -7,11 +7,11 @@ import {
 import {
   defineProperties,
   getPrototypeChain,
-  recognizeElement,
+  recognizeElementByIsAttribute,
   runForDescendants,
   setPrototypeOf,
   setup,
-  setupAndConnect,
+  connect,
 } from './utils';
 
 const CERExceptionCommonText =
@@ -74,10 +74,13 @@ function patchCustomElementsRegistry() {
         const pattern = new RegExp(options.extends, 'i');
 
         runForDescendants(
-          document,
+          document.body,
           node =>
             pattern.test(node.tagName) && node.getAttribute('is') === name,
-          setupAndConnect,
+          node => {
+            setup(node);
+            connect(node);
+          },
         );
       },
     },
@@ -90,7 +93,7 @@ function patchCustomElementsRegistry() {
     upgrade: {
       configurable: true,
       value(element) {
-        const constructor = recognizeElement(element);
+        const constructor = recognizeElementByIsAttribute(element);
 
         if (constructor) {
           setup(element, constructor);

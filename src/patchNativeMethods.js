@@ -7,8 +7,7 @@ import {
   createElementObserver,
   defineProperty,
   getOwnPropertyDescriptor,
-  isConnectedToObservingNode,
-  recognizeElement,
+  recognizeElementByIsAttribute,
   runForDescendants,
   setup,
 } from './utils';
@@ -23,7 +22,11 @@ function patch(proto, name) {
       result.nodeType === Node.ELEMENT_NODE ||
       result.nodeType === Node.DOCUMENT_FRAGMENT_NODE
     ) {
-      runForDescendants(result.content || result, recognizeElement, setup);
+      runForDescendants(
+        result.content || result,
+        recognizeElementByIsAttribute,
+        setup,
+      );
     }
   };
 }
@@ -60,8 +63,8 @@ function patchNativeMethods() {
   proto.insertAdjacentHTML = function(_, html) {
     insertAdjacentHTML.apply(this, arguments);
 
-    if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
-      runForDescendants(this, recognizeElement, setup);
+    if (isPattern.test(html)) {
+      runForDescendants(this, recognizeElementByIsAttribute, setup);
     }
   };
 
@@ -72,8 +75,8 @@ function patchNativeMethods() {
     set(html) {
       set.call(this, html);
 
-      if (isPattern.test(html) && !isConnectedToObservingNode(this)) {
-        runForDescendants(this, recognizeElement, setup);
+      if (isPattern.test(html)) {
+        runForDescendants(this, recognizeElementByIsAttribute, setup);
       }
     },
   });

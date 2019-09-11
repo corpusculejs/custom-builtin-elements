@@ -2,6 +2,7 @@ import {
   $connectedCallback,
   $disconnectedCallback,
   elementsRegistry,
+  elementsReversedRegistry,
   lifecycleRegistry,
   supportsNativeWebComponents,
   upgradedElementsRegistry,
@@ -24,7 +25,10 @@ export function getPrototypeChain(proto) {
   while (true) {
     currentProto = getPrototypeOf(currentProto);
 
-    if (currentProto === Object.prototype) {
+    if (
+      currentProto === Object.prototype ||
+      currentProto === HTMLElement.prototype
+    ) {
       return chain;
     }
 
@@ -75,13 +79,19 @@ export function runForDescendants(root, check, callback, pierce = false) {
   }
 }
 
-export function recognizeElement(element) {
+export function recognizeElementByIsAttribute(element) {
   const name = element.getAttribute('is');
 
   return name && elementsRegistry[name];
 }
 
-export function setup(element, constructor) {
+export function recognizeElementByConstructor({constructor}) {
+  return elementsReversedRegistry.has(constructor) && constructor;
+}
+
+export function setup(element) {
+  const constructor = recognizeElementByIsAttribute(element);
+
   if (!upgradedElementsRegistry.has(element)) {
     upgradingRegistry.set(constructor, element);
     new constructor(); // eslint-disable-line no-new
@@ -89,28 +99,18 @@ export function setup(element, constructor) {
   }
 }
 
-export function setupAndConnect(element) {
-  const constructor = recognizeElement(element);
-
-  if (constructor) {
-    setup(element, constructor);
-
-    if (
-      isConnected(element) &&
-      $connectedCallback in element &&
-      lifecycleRegistry.get(element) !== $connectedCallback
-    ) {
-      element[$connectedCallback]();
-      lifecycleRegistry.set(element, $connectedCallback);
-    }
+export function connect(element) {
+  if (
+    $connectedCallback in element &&
+    lifecycleRegistry.get(element) !== $connectedCallback
+  ) {
+    element[$connectedCallback]();
+    lifecycleRegistry.set(element, $connectedCallback);
   }
 }
 
 export function disconnect(element) {
-  const constructor = recognizeElement(element);
-
   if (
-    constructor &&
     $disconnectedCallback in element &&
     lifecycleRegistry.get(element) !== $disconnectedCallback
   ) {
@@ -123,11 +123,25 @@ function watchDOMChanges(mutations) {
   for (let i = 0, iLen = mutations.length; i < iLen; i++) {
     const {addedNodes, removedNodes} = mutations[i];
     for (let j = 0, jLen = addedNodes.length; j < jLen; j++) {
-      runForDescendants(addedNodes[j], recognizeElement, setupAndConnect, true);
+      // We run connectedCallback only for elements that are connected to the
+      // document DOM.
+      if (isConnected(addedNodes[j])) {
+        runForDescendants(
+          addedNodes[j],
+          recognizeElementByConstructor,
+          connect,
+          true,
+        );
+      }
     }
 
     for (let j = 0, jLen = removedNodes.length; j < jLen; j++) {
-      runForDescendants(removedNodes[j], recognizeElement, disconnect, true);
+      runForDescendants(
+        removedNodes[j],
+        recognizeElementByConstructor,
+        disconnect,
+        true,
+      );
     }
   }
 }
@@ -137,20 +151,20 @@ export function createElementObserver(element) {
   observer.observe(element, {childList: true, subtree: true});
 }
 
-export function isConnectedToObservingNode(element) {
-  if (isConnected(element)) {
-    return true;
-  }
-
-  let node = element;
-
-  while (node) {
-    if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-      return true;
-    }
-
-    node = node.parentNode;
-  }
-
-  return false;
-}
+// Export function isConnectedToObservingNode(element) {
+//   if (isConnected(element)) {
+//     return true;
+//   }
+//
+//   let node = element;
+//
+//   while (node) {
+//     if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+//       return true;
+//     }
+//
+//     node = node.parentNode;
+//   }
+//
+//   return false;
+// }

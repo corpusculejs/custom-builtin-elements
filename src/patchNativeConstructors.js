@@ -52,13 +52,12 @@ function patchNativeConstructors() {
         setPrototypeOf(element, constructor.prototype);
         element.constructor = constructor;
 
-        if (
-          element.observedAttributes &&
-          element.observedAttributes.length > 0
-        ) {
+        const {observedAttributes} = constructor;
+
+        if (observedAttributes && observedAttributes.length > 0) {
           const observer = new MutationObserver(attributeChanged);
           observer.observe(element, {
-            attributeFilter: element.observedAttributes,
+            attributeFilter: observedAttributes,
             attributeOldValue: true,
             attributes: true,
           });
