@@ -24,7 +24,7 @@ const waitForMutationObserverChange = async (elementToObserve, options) => {
 const observeChildren = {childList: true, subtree: true};
 const observeAttributes = {attributes: true};
 
-const isPolyfill = HTMLButtonElement.name !== 'HTMLButtonElement';
+const hasNativeCustomElementRegistry = 'CustomElementRegistry' in window;
 
 describe('custom-builtin-elements-polyfill', () => {
   describe('constructor', () => {
@@ -97,7 +97,7 @@ describe('custom-builtin-elements-polyfill', () => {
     });
   });
 
-  describe('CustomElementsRegistry', () => {
+  describe('CustomElementRegistry', () => {
     describe('define', () => {
       it('upgrades elements that exist on the page before declaration', async () => {
         const name = generateName();
@@ -146,7 +146,7 @@ describe('custom-builtin-elements-polyfill', () => {
       });
 
       it('uses the native method if no options provided', () => {
-        if (!isPolyfill) {
+        if (hasNativeCustomElementRegistry) {
           pending();
         }
 
@@ -167,7 +167,7 @@ describe('custom-builtin-elements-polyfill', () => {
       });
 
       it('runs native method if if the element is not recognized', () => {
-        if (!isPolyfill) {
+        if (hasNativeCustomElementRegistry) {
           pending();
         }
 
@@ -197,7 +197,7 @@ describe('custom-builtin-elements-polyfill', () => {
       });
 
       it('uses the native method if the element is not recognized', () => {
-        if (!isPolyfill) {
+        if (hasNativeCustomElementRegistry) {
           pending();
         }
 
@@ -217,7 +217,7 @@ describe('custom-builtin-elements-polyfill', () => {
       });
 
       it('uses the native method if the element is not recognized', () => {
-        if (!isPolyfill) {
+        if (hasNativeCustomElementRegistry) {
           pending();
         }
 
