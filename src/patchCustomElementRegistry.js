@@ -76,6 +76,7 @@ function patchCustomElementRegistry() {
             setup(node);
             connect(node);
           },
+          true,
         );
       },
     },
