@@ -35,7 +35,7 @@ module.exports = config => {
     browserDisconnectTolerance: 1,
     captureTimeout: 60000,
 
-    frameworks: ['jasmine', 'detectBrowsers'],
+    frameworks: ['jasmine'],
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
