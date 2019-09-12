@@ -12,7 +12,7 @@ import {
   setup,
 } from './utils';
 
-function patch(proto, name) {
+function patchPickingMethod(proto, name) {
   const nativeMethod = proto[name];
 
   proto[name] = function() {
@@ -31,6 +31,21 @@ function patch(proto, name) {
 
     return result;
   };
+}
+
+function patchInnerHTML(proto) {
+  const {get, set} = getOwnPropertyDescriptor(proto, 'innerHTML');
+  defineProperty(proto, 'innerHTML', {
+    configurable: true,
+    get,
+    set(html) {
+      set.call(this, html);
+
+      if (isPattern.test(html)) {
+        runForDescendants(this, recognizeElementByIsAttribute, setup);
+      }
+    },
+  });
 }
 
 function patchNativeMethods() {
@@ -53,16 +68,16 @@ function patchNativeMethods() {
     };
   }
 
-  patch(Document.prototype, 'importNode');
-  patch(Node.prototype, 'cloneNode');
+  patchPickingMethod(Document.prototype, 'importNode');
+  patchPickingMethod(Node.prototype, 'cloneNode');
 
-  const proto =
+  const elementPrototype =
     'innerHTML' in Element.prototype
       ? Element.prototype
       : HTMLElement.prototype;
 
-  const {insertAdjacentHTML} = proto;
-  proto.insertAdjacentHTML = function(_, html) {
+  const {insertAdjacentHTML} = elementPrototype;
+  elementPrototype.insertAdjacentHTML = function(_, html) {
     insertAdjacentHTML.apply(this, arguments);
 
     if (isPattern.test(html)) {
@@ -70,18 +85,11 @@ function patchNativeMethods() {
     }
   };
 
-  const {get, set} = getOwnPropertyDescriptor(proto, 'innerHTML');
-  defineProperty(proto, 'innerHTML', {
-    configurable: true,
-    get,
-    set(html) {
-      set.call(this, html);
+  patchInnerHTML(elementPrototype);
 
-      if (isPattern.test(html)) {
-        runForDescendants(this, recognizeElementByIsAttribute, setup);
-      }
-    },
-  });
+  if (supportsNativeWebComponents) {
+    patchInnerHTML(ShadowRoot.prototype);
+  }
 }
 
 export default patchNativeMethods;
