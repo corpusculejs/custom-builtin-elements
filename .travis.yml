@@ -11,4 +11,5 @@ branches:
     - master
 script:
   - npm run test:coverage
-  - codecov
+after_success:
+  - ./node_modules/.bin/codecov -e TRAVIS_NODE_VERSION -f .coverage/lcov.info
