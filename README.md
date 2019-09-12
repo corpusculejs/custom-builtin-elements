@@ -43,8 +43,14 @@ To use this polyfill with IE 11 you need the following tools:
 * [@babel/plugin-transform-instanceof](https://www.npmjs.com/package/@babel/plugin-transform-instanceof)
 applied to your code that uses `instanceof` against any built-in constructor
 (like `HTMLButtonElement` etc.).
-* Custom implementation for the `customElements` registry that would allow
-polyfill to overwrite it. You can do it very easy:
+
+Also, for all browsers that do not support native web components, you need an
+implementation of the `customElements` registry existing. You may use either the
+[`@webcomponents/webcomponentsjs`](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs)
+polyfill to have autonomous custom elements as well or the following stub that
+would allow you to use only the customized built-in elements. Note that you have
+to place the `customElements` implementation **before** this polyfill.
+
 ```javascript
 function impl() {
   throw new Error('Not supported in this environment');
@@ -56,7 +62,7 @@ window.customElements = {
   upgrade: impl,
   whenDefined: impl,
 };
-```
+```  
 
 ## Example
 ```javascript
