@@ -499,7 +499,14 @@ describe('custom-builtin-elements-polyfill', () => {
 
       // eslint-disable-next-line prefer-destructuring
       const bar = foo.shadowRoot.children[0];
+
+      const promise = waitForMutationObserverChange(
+        foo.shadowRoot,
+        observeChildren,
+      );
       bar.parentNode.removeChild(bar);
+
+      await promise;
 
       expect(disconnectedCallbackSpy).toHaveBeenCalledTimes(1);
     });
@@ -523,7 +530,14 @@ describe('custom-builtin-elements-polyfill', () => {
       const tag = defineCE(Foo);
       const foo = await fixture(`<${tag}></${tag}>`);
 
+      const promise = waitForMutationObserverChange(
+        document.body,
+        observeChildren,
+      );
+
       foo.parentNode.removeChild(foo);
+
+      await promise;
 
       expect(disconnectedCallbackSpy).toHaveBeenCalledTimes(1);
     });
