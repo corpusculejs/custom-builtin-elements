@@ -6,7 +6,6 @@ matrix:
       osx_image: xcode11
       addons:
         chrome: stable
-        firefox: latest
 branches:
   only:
     - master
