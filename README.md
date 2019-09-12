@@ -36,6 +36,28 @@ $ yarn add @corpuscule/custom-builtin-elements
 import "https://unpkg.com/@corpuscule/custom-builtin-elements";
 ```
 
+## Support
+To use this polyfill with IE 11 you need the following tools:
+* `Symbol` polyfill (with support for `Symbol.hasInstance`).
+* `WeakSet` polyfill.
+* [@babel/plugin-transform-instanceof](https://www.npmjs.com/package/@babel/plugin-transform-instanceof)
+applied to your code that uses `instanceof` against any built-in constructor
+(like `HTMLButtonElement` etc.).
+* Custom implementation for the `customElements` registry that would allow
+polyfill to overwrite it. You can do it very easy:
+```javascript
+function impl() {
+  throw new Error('Not supported in this environment');
+}
+
+window.customElements = {
+  define: impl,
+  get: impl,
+  upgrade: impl,
+  whenDefined: impl,
+};
+```
+
 ## Example
 ```javascript
 class ClickCounter extends HTMLButtonElement {
