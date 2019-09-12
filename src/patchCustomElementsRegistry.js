@@ -61,11 +61,6 @@ function patchCustomElementsRegistry() {
         if (!patchedPrototypesRegistry.has(firstChild)) {
           setPrototypeOf(firstChild, nativeConstructor.prototype);
           patchedPrototypesRegistry.add(firstChild);
-
-          Object.defineProperty(firstChild.constructor, Symbol.hasInstance, {
-            configurable: true,
-            value: null,
-          });
         }
 
         elementsRegistry[name] = constructor;

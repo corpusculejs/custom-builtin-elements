@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import {
   $attributeChangedCallback,
   elementsReversedRegistry,
@@ -72,7 +73,9 @@ function patchNativeConstructors() {
     defineProperty(PolyfilledConstructor, Symbol.hasInstance, {
       configurable: true,
       value(instance) {
-        return instance instanceof NativeConstructor;
+        return this === PolyfilledConstructor
+          ? NativeConstructor.prototype.isPrototypeOf(instance)
+          : this.prototype.isPrototypeOf(instance);
       },
     });
 
