@@ -2,7 +2,12 @@
 const {readFileSync} = require('fs');
 const {resolve} = require('path');
 
-const isCI = !!process.env.CI;
+const {CI, TRAVIS_OS_NAME} = process.env;
+
+const isCI = !!CI;
+const isWindows = TRAVIS_OS_NAME === 'windows';
+const isOsx = TRAVIS_OS_NAME === 'osx';
+
 const watch = !!process.argv.find(arg => arg.includes('watch')) && !isCI;
 const coverage = !!process.argv.find(arg => arg.includes('--coverage'));
 
@@ -17,12 +22,10 @@ module.exports = config => {
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
-      require('karma-firefox-launcher'),
       require('karma-safarinative-launcher'),
       require('karma-ie-launcher'),
       require('karma-edge-launcher'),
       require('karma-coverage-istanbul-reporter'),
-      require('karma-detect-browsers'),
       require('karma-rollup-preprocessor'),
       require('karma-babel-preprocessor'),
     ],
@@ -66,20 +69,19 @@ module.exports = config => {
       },
     },
 
+    browsers: isCI
+      ? [
+          isOsx && 'ChromeHeadlessNoSandbox',
+          isOsx && 'Safari',
+          isWindows && 'Edge',
+          isWindows && 'IE',
+        ].filter(Boolean)
+      : ['ChromeHeadless', 'Edge', 'IE'],
+
     customLaunchers: {
       Safari: {
         base: 'SafariNative',
       },
-    },
-
-    detectBrowsers: {
-      postDetection(availableBrowsers) {
-        return availableBrowsers.filter(
-          browser => browser !== 'FirefoxHeadless',
-        );
-      },
-      preferHeadless: true,
-      usePhantomJS: false,
     },
 
     rollupPreprocessor: {
