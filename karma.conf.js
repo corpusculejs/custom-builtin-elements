@@ -2,11 +2,9 @@
 const {readFileSync} = require('fs');
 const {resolve} = require('path');
 
-const {CI, TRAVIS_OS_NAME} = process.env;
+const {CI} = process.env;
 
 const isCI = !!CI;
-const isWindows = TRAVIS_OS_NAME === 'windows';
-const isOsx = TRAVIS_OS_NAME === 'osx';
 
 const watch = !!process.argv.find(arg => arg.includes('watch')) && !isCI;
 const coverage = !!process.argv.find(arg => arg.includes('--coverage'));
@@ -20,14 +18,15 @@ module.exports = config => {
     basePath: '',
 
     plugins: [
-      require('karma-jasmine'),
-      require('karma-chrome-launcher'),
-      require('karma-safarinative-launcher'),
-      require('karma-ie-launcher'),
-      require('karma-edge-launcher'),
-      require('karma-coverage-istanbul-reporter'),
-      require('karma-rollup-preprocessor'),
       require('karma-babel-preprocessor'),
+      require('karma-chrome-launcher'),
+      require('karma-coverage-istanbul-reporter'),
+      require('karma-detect-browsers'),
+      require('karma-edge-launcher'),
+      require('karma-jasmine'),
+      require('karma-ie-launcher'),
+      require('karma-rollup-preprocessor'),
+      require('karma-safarinative-launcher'),
     ],
 
     browserNoActivityTimeout: 60000,
@@ -35,7 +34,7 @@ module.exports = config => {
     browserDisconnectTolerance: 1,
     captureTimeout: 60000,
 
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', !isCI && 'detectBrowsers'].filter(Boolean),
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
@@ -51,7 +50,7 @@ module.exports = config => {
       '__tests__/index.js': ['rollup'],
     },
 
-    reporters: coverage ? ['progress', 'coverage-istanbul'] : ['progress'],
+    reporters: ['progress', coverage && 'coverage-istanbul'].filter(Boolean),
 
     port: 9876,
     colors: true,
@@ -69,16 +68,13 @@ module.exports = config => {
       },
     },
 
-    browsers: isCI
-      ? [
-          isOsx && 'ChromeHeadlessNoSandbox',
-          isOsx && 'Safari',
-          isWindows && 'Edge',
-          isWindows && 'IE',
-        ].filter(Boolean)
-      : ['ChromeHeadless', 'Edge', 'IE'],
+    browsers: isCI ? ['ChromeHeadlessNoSandbox', 'Safari'] : undefined,
 
     customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
       Safari: {
         base: 'SafariNative',
       },
@@ -105,6 +101,16 @@ module.exports = config => {
         format: 'iife',
         name: 'customBuiltInElements',
       },
+    },
+
+    detectBrowsers: {
+      postDetection(availableBrowsers) {
+        return availableBrowsers.filter(
+          browser => browser !== 'FirefoxHeadless',
+        );
+      },
+      preferHeadless: true,
+      usePhantomJS: false,
     },
 
     babelPreprocessor: {
