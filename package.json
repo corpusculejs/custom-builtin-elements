@@ -1,11 +1,11 @@
 {
-  "name": "@corpuscule/custom-builtin-elements-polyfill",
+  "name": "@corpuscule/custom-builtin-elements",
   "version": "0.1.0",
-  "description": "A polyfill to support all features of customized built-in elements",
-  "main": "dist/customBuiltInElementsPolyfill.js",
-  "module": "dist/customBuiltInElementsPolyfill.js",
+  "description": "A full-featured polyfill for customized built-in elements",
+  "main": "lib/customBuiltInElements.js",
+  "module": "lib/customBuiltInElements.js",
   "files": [
-    "dist/customBuiltInElementsPolyfill.js"
+    "lib/customBuiltInElements.js"
   ],
   "scripts": {
     "build": "node scripts/build.js",
@@ -16,17 +16,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/corpusculejs/custom-builtin-elements-polyfill.git"
+    "url": "git+https://github.com/corpusculejs/custom-builtin-elements.git"
   },
   "keywords": [
-    "polyfill"
+    "polyfill",
+    "custom",
+    "built-in",
+    "element",
+    "web",
+    "components"
   ],
   "author": "Vlad Rindevich <rindevich.vs@gmail.com> (https://github.com/Lodin)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/corpusculejs/custom-builtin-elements-polyfill/issues"
+    "url": "https://github.com/corpusculejs/custom-builtin-elements/issues"
   },
-  "homepage": "https://github.com/corpusculejs/custom-builtin-elements-polyfill#readme",
+  "homepage": "https://github.com/corpusculejs/custom-builtin-elements#readme",
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-optional-chaining": "^7.6.0",

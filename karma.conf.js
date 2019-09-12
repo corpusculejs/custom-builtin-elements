@@ -36,7 +36,7 @@ module.exports = config => {
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
-      'lib/customBuiltInElementsPolyfill.js',
+      'lib/customBuiltInElements.js',
       {pattern: '__tests__/index.js', watched: false},
     ],
 
@@ -44,7 +44,7 @@ module.exports = config => {
 
     preprocessors: {
       '__tests__/polyfills.js': ['rollup'],
-      'lib/customBuiltInElementsPolyfill.js': coverage ? ['babel'] : [],
+      'lib/customBuiltInElements.js': coverage ? ['babel'] : [],
       '__tests__/index.js': ['rollup'],
     },
 
@@ -75,7 +75,7 @@ module.exports = config => {
     detectBrowsers: {
       postDetection(availableBrowsers) {
         return availableBrowsers.filter(
-          browser => browser !== 'FirefoxHeadless' && browser !== 'Edge', // && browser !== 'IE',
+          browser => browser !== 'FirefoxHeadless',
         );
       },
       preferHeadless: true,
@@ -101,7 +101,7 @@ module.exports = config => {
       ],
       output: {
         format: 'iife',
-        name: 'customBuiltInElementsPolyfill',
+        name: 'customBuiltInElements',
       },
     },
 
