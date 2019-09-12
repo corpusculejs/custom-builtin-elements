@@ -19,7 +19,7 @@ const CERExceptionCommonText =
 
 const dashPattern = /-/;
 
-function patchCustomElementsRegistry() {
+function patchCustomElementRegistry() {
   const {define, get, upgrade, whenDefined} = customElements;
 
   defineProperties(customElements, {
@@ -108,4 +108,4 @@ function patchCustomElementsRegistry() {
   });
 }
 
-export default patchCustomElementsRegistry;
+export default patchCustomElementRegistry;
