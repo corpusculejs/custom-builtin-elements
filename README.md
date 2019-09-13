@@ -51,31 +51,37 @@ import 'https://unpkg.com/@corpuscule/custom-builtin-elements';
 To use this polyfill with IE 11 you need the following tools:
 
 - `Symbol` polyfill (with support for `Symbol.hasInstance`).
-- `WeakSet` polyfill.
 - `Promise` polyfill.
 - [@babel/plugin-transform-instanceof](https://www.npmjs.com/package/@babel/plugin-transform-instanceof)
   applied to your code that uses `instanceof` against any built-in constructor
   (like `HTMLButtonElement` etc.).
 
 Also, for all browsers that do not support native web components, you need an
-implementation of the `customElements` registry existing. You may use either the
-[`@webcomponents/webcomponentsjs`](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs)
-polyfill to have autonomous custom elements as well or the following stub that
-would allow you to use only the customized built-in elements. Note that you have
-to place the `customElements` implementation **before** this polyfill.
+implementation of the `customElements` registry existing. You have the following
+choices:
+
+- Use [`@webcomponents/webcomponentsjs`](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs),
+  that will also add support for autonomous custom elements.
+- Use the minimal implementation of `customElements` provided by this polyfill
+  that would allow you to use the customized built-in elements only.
+
+Minimal implementation could be added in the following way:
+
+- via npm:
 
 ```javascript
-function impl() {
-  throw new Error('Not supported in this environment');
-}
-
-window.customElements = {
-  define: impl,
-  get: impl,
-  upgrade: impl,
-  whenDefined: impl,
-};
+import '@corpuscule/custom-builtin-elements/lib/customElementsBase';
 ```
+
+- via [https://unpkg.com](https://unpkg.com)
+
+```javascript
+import 'https://unpkg.com/@corpuscule/custom-builtin-elements/lib/customElementsBase.js';
+```
+
+Note that both minimal implementation or `@webcomponents/webcomponentsjs`
+polyfill should be executed **before** this polyfill because it will override
+methods of `customElements` registry.
 
 ## Example
 

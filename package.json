@@ -5,11 +5,13 @@
   "main": "lib/customBuiltInElements.js",
   "module": "lib/customBuiltInElements.js",
   "files": [
-    "lib/customBuiltInElements.js"
+    "lib/customBuiltInElements.js",
+    "lib/customElementsBase.js"
   ],
   "scripts": {
     "build": "node scripts/build.js",
     "lint": "eslint src/**/*.js",
+    "size": "npm run build && size-limit",
     "test": "npm run build && karma start",
     "test:watch": "npm run test -- --watch",
     "test:coverage": "npm run test -- --coverage"
