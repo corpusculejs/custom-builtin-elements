@@ -151,9 +151,7 @@ describe('custom-builtin-elements-polyfill', () => {
         }
 
         class Foo {}
-        expect(() => defineCE(Foo)).toThrowError(
-          'Not supported in this environment',
-        );
+        expect(() => defineCE(Foo)).toThrowError('Not supported');
       });
     });
 
@@ -171,9 +169,7 @@ describe('custom-builtin-elements-polyfill', () => {
           pending();
         }
 
-        expect(() => customElements.get('x-foo')).toThrowError(
-          'Not supported in this environment',
-        );
+        expect(() => customElements.get('x-foo')).toThrowError('Not supported');
       });
     });
 
@@ -202,9 +198,7 @@ describe('custom-builtin-elements-polyfill', () => {
         }
 
         const foo = document.createElement('x-foo');
-        expect(() => customElements.upgrade(foo)).toThrowError(
-          'Not supported in this environment',
-        );
+        expect(() => customElements.upgrade(foo)).toThrowError('Not supported');
       });
     });
 
@@ -222,7 +216,7 @@ describe('custom-builtin-elements-polyfill', () => {
         }
 
         expect(() => customElements.whenDefined('x-foo')).toThrowError(
-          'Not supported in this environment',
+          'Not supported',
         );
       });
     });
