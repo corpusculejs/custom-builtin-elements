@@ -65,23 +65,25 @@ choices:
 - Use the minimal implementation of `customElements` provided by this polyfill
   that would allow you to use the customized built-in elements only.
 
-Minimal implementation could be added in the following way:
+Note that both minimal implementation or `@webcomponents/webcomponentsjs`
+polyfill should be executed **before** the main polyfill because it will
+override methods of the `customElements` registry.
 
-- via npm:
+Examples of adding minimal implementation:
+
+- via npm and ESM:
 
 ```javascript
 import '@corpuscule/custom-builtin-elements/lib/customElementsBase';
+import '@corpuscule/custom-builtin-elements';
 ```
 
-- via [https://unpkg.com](https://unpkg.com)
+- via [https://unpkg.com](https://unpkg.com) and `script`:
 
-```javascript
-import 'https://unpkg.com/@corpuscule/custom-builtin-elements/lib/customElementsBase.js';
+```html
+<script src="https://unpkg.com/@corpuscule/custom-builtin-elements/lib/customElementsBase.js">
+<script src="https://unpkg.com/@corpuscule/custom-builtin-elements">
 ```
-
-Note that both minimal implementation or `@webcomponents/webcomponentsjs`
-polyfill should be executed **before** this polyfill because it will override
-methods of `customElements` registry.
 
 ## Example
 
