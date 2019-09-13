@@ -56,9 +56,9 @@ export const nativeConstructorRegistry = new WeakMap();
  * it, during the B registration, we put the A.prototype to this registry, and
  * then won't perform patch to it anymore.
  *
- * @type {WeakSet<object>}
+ * @type {WeakMap<object, number>}
  */
-export const patchedPrototypesRegistry = new WeakSet();
+export const patchedPrototypesRegistry = new WeakMap();
 
 /**
  * A registry that contains the current connection state of the specific element.
