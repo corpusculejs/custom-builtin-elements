@@ -81,8 +81,8 @@ import '@corpuscule/custom-builtin-elements';
 - via [https://unpkg.com](https://unpkg.com) and `script`:
 
 ```html
-<script src="https://unpkg.com/@corpuscule/custom-builtin-elements/lib/customElementsBase.js">
-<script src="https://unpkg.com/@corpuscule/custom-builtin-elements">
+<script src="https://unpkg.com/@corpuscule/custom-builtin-elements/lib/customElementsBase.js"></script>
+<script src="https://unpkg.com/@corpuscule/custom-builtin-elements"></script>
 ```
 
 ## Example
