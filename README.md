@@ -17,9 +17,9 @@ not have this feature on board. This polyfill aims to fill this gap and provide
 support for this feature for all browsers that miss it.
 
 You may have a question: why choose this polyfill if there already is a
-well-known and popular [`@ungap/built-in-elements`](https://github.com/ungap/custom-elements-builtin)?
+well-known and popular [`@ungap/custom-elements-builtin`](https://github.com/ungap/custom-elements-builtin)?
 Unfortunately, it has some problems that make it hard to use. For example, with
-the `@ungap/built-in-elements` you cannot use class constructors or create new
+the `@ungap/custom-elements-builtin` you cannot use class constructors or create new
 elements with the `new` operator.
 
 This polyfill provides the solution for all of these issues and makes it
