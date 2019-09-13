@@ -24,7 +24,8 @@ function attributeChanged(mutations) {
 }
 
 function patchNativeConstructors() {
-  nativeConstructorNames.forEach(nativeConstructorName => {
+  nativeConstructorNames.forEach(nativeNamePart => {
+    const nativeConstructorName = `HTML${nativeNamePart}Element`;
     const NativeConstructor = window[nativeConstructorName];
 
     class PolyfilledConstructor {

@@ -38,6 +38,7 @@ module.exports = config => {
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
+      'lib/customElementsBase.js',
       'lib/customBuiltInElements.js',
       {pattern: '__tests__/index.js', watched: false},
     ],

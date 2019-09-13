@@ -60,7 +60,7 @@ function patchCustomElementRegistry() {
 
         if (!patchedPrototypesRegistry.has(firstChild)) {
           setPrototypeOf(firstChild, nativeConstructor.prototype);
-          patchedPrototypesRegistry.add(firstChild);
+          patchedPrototypesRegistry.set(firstChild, 0);
         }
 
         elementsRegistry[name] = constructor;
