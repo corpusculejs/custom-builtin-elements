@@ -69,8 +69,6 @@ module.exports = config => {
       },
     },
 
-    browsers: isCI ? ['ChromeHeadlessNoSandbox', 'Safari'] : undefined,
-
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
@@ -106,9 +104,16 @@ module.exports = config => {
 
     detectBrowsers: {
       postDetection(availableBrowsers) {
-        return availableBrowsers.filter(
+        const preparedBrowsers = availableBrowsers.filter(
           browser => browser !== 'FirefoxHeadless',
         );
+
+        if (CI && preparedBrowsers.includes('ChromeHeadless')) {
+          preparedBrowsers[preparedBrowsers.indexOf('ChromeHeadless')] =
+            'ChromeHeadlessNoSandbox';
+        }
+
+        return preparedBrowsers;
       },
       preferHeadless: true,
       usePhantomJS: false,
