@@ -27,9 +27,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Installation
         run: npm install
-      - name: Testing
+      - name: Run Test Suite
         run: npm test
         env:
           CI: true
-      - name: SonarCloud Scan
+  analysis:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Run Analysis
         uses: SonarSource/sonarcloud-github-action@v1.1
