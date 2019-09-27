@@ -34,7 +34,7 @@ module.exports = config => {
     browserDisconnectTolerance: 1,
     captureTimeout: 60000,
 
-    frameworks: ['jasmine', !isCI && 'detectBrowsers'].filter(Boolean),
+    frameworks: ['jasmine', 'detectBrowsers'].filter(Boolean),
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
@@ -68,8 +68,6 @@ module.exports = config => {
         lcovonly: {subdir: 'lcov'},
       },
     },
-
-    browsers: isCI ? ['ChromeHeadlessNoSandbox', 'Safari'] : undefined,
 
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
@@ -106,9 +104,26 @@ module.exports = config => {
 
     detectBrowsers: {
       postDetection(availableBrowsers) {
-        return availableBrowsers.filter(
+        // Firefox has all the features implemented as well as Chrome, so Chrome
+        // is enough
+        let preparedBrowsers = availableBrowsers.filter(
           browser => browser !== 'FirefoxHeadless',
         );
+
+        if (isCI) {
+          // The stable Edge is not supported by Github CI
+          preparedBrowsers = preparedBrowsers.filter(
+            browser => browser !== 'Edge',
+          );
+
+          const chromeIndex = preparedBrowsers.indexOf('ChromeHeadless');
+
+          if (chromeIndex > -1) {
+            preparedBrowsers[chromeIndex] = 'ChromeHeadlessNoSandbox';
+          }
+        }
+
+        return preparedBrowsers;
       },
       preferHeadless: true,
       usePhantomJS: false,
