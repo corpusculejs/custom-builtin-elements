@@ -1,0 +1,56 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ci:
+    name: 'OS: ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+        os: [windows-latest, macOS-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Installation
+        run: npm install
+      - name: Run Test Suite
+        run: npm test
+        env:
+          CI: true
+  analysis:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run Sonar Scanner
+        run: |
+          export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
+          rm -rf $SONAR_SCANNER_HOME
+          mkdir -p $SONAR_SCANNER_HOME
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+          unzip $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+          rm $HOME/.sonar/sonar-scanner.zip
+          export PATH=$SONAR_SCANNER_HOME/bin:$PATH
+          export SONAR_SCANNER_OPTS="-server"
+          cd $GITHUB_WORKSPACE
+          sonar-scanner \
+            -Dsonar.login=$SONAR_TOKEN
+        env:
+          SONAR_SCANNER_VERSION: 4.0.0.1744
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
