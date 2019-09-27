@@ -64,6 +64,8 @@ jobs:
           path: .coverage/lcov/macOS.lcov
       - name: Run Sonar Scanner
         run: |
+          ls $GITHUB_WORKSPACE/.coverage/lcov
+
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
           rm -rf $SONAR_SCANNER_HOME
           mkdir -p $SONAR_SCANNER_HOME
