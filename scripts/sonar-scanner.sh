@@ -18,8 +18,7 @@ unzip $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
 
 rm $HOME/.sonar/sonar-scanner.zip
 
-export PATH=$SONAR_SCANNER_HOME/bin:$PATH
 export SONAR_SCANNER_OPTS="-server"
 
 cd $GITHUB_WORKSPACE
-sonar-scanner -Dsonar.login=$SONAR_TOKEN
+$SONAR_SCANNER_HOME/bin/sonar-scanner -Dsonar.login=$SONAR_TOKEN
