@@ -75,8 +75,9 @@ jobs:
           cd $GITHUB_WORKSPACE
           sonar-scanner \
             -Dsonar.login=$SONAR_TOKEN
-          echo "COVERAGE_LCOV"
-          ls $GITHUB_WORKSPACE/.coverage/lcov
+            -Dsonar.javascript.lcov.reportPaths=\
+              $GITHUB_WORKSPACE/.coverage/lcov/windows-lcov.info,\
+              $GITHUB_WORKSPACE/.coverage/lcov/macOS-lcov.info
         env:
           SONAR_SCANNER_VERSION: 4.0.0.1744
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
