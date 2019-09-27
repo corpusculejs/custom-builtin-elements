@@ -75,6 +75,10 @@ jobs:
           export PATH=$SONAR_SCANNER_HOME/bin:$PATH
           export SONAR_SCANNER_OPTS="-server"
           cd $GITHUB_WORKSPACE
+
+          echo "COVERAGE_LCOV"
+          ls $GITHUB_WORKSPACE/.coverage/lcov
+
           sonar-scanner \
             -Dsonar.login=$SONAR_TOKEN
         env:
