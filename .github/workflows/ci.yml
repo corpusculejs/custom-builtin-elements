@@ -37,7 +37,8 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Install Sonar Scanner
+      - uses: actions/checkout@v1
+      - name: Run Sonar
         uses: Lodin/sonarcloud-github-action@v1.2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
