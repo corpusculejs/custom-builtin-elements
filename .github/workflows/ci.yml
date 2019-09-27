@@ -39,3 +39,5 @@ jobs:
     steps:
       - name: Run Analysis
         uses: SonarSource/sonarcloud-github-action@v1.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
