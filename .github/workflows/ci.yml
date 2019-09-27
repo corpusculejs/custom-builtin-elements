@@ -56,16 +56,14 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: windows-latest.lcov
-          path: .coverage/lcov/windows.lcov
+          path: .coverage/lcov/windows-lcov.info
       - name: Load macOS-latest code coverage
         uses: actions/download-artifact@master
         with:
           name: macOS-latest.lcov
-          path: .coverage/lcov/macOS.lcov
+          path: .coverage/lcov/macOS-lcov.info
       - name: Run Sonar Scanner
         run: |
-          ls $GITHUB_WORKSPACE/.coverage/lcov
-
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
           rm -rf $SONAR_SCANNER_HOME
           mkdir -p $SONAR_SCANNER_HOME
@@ -75,12 +73,10 @@ jobs:
           export PATH=$SONAR_SCANNER_HOME/bin:$PATH
           export SONAR_SCANNER_OPTS="-server"
           cd $GITHUB_WORKSPACE
-
-          echo "COVERAGE_LCOV"
-          ls $GITHUB_WORKSPACE/.coverage/lcov
-
           sonar-scanner \
             -Dsonar.login=$SONAR_TOKEN
+          echo "COVERAGE_LCOV"
+          ls $GITHUB_WORKSPACE/.coverage/lcov
         env:
           SONAR_SCANNER_VERSION: 4.0.0.1744
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
