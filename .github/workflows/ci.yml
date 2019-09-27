@@ -27,11 +27,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Installation
         run: npm install
-      - name: Run Test Suite
+      - name: Run test suite
         run: npm run test:coverage
         env:
           CI: true
-      - name: Save ${{ matrix.os }} code coverage
+      - name: Save code coverage
         uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}.lcov
@@ -56,12 +56,12 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: windows-latest.lcov
-          path: .coverage/windows.lcov.info
+          path: .coverage/lcov/windows.lcov
       - name: Load macOS-latest code coverage
         uses: actions/download-artifact@master
         with:
           name: macOS-latest.lcov
-          path: .coverage/macOS.lcov.info
+          path: .coverage/lcov/macOS.lcov
       - name: Run Sonar Scanner
         run: |
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
