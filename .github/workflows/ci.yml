@@ -36,8 +36,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    strategy:
+      matrix:
+        sonar-version: 4.0.0.1744
+
     steps:
+      - name: Install Sonar Scanner
+        run: |
+          export SONAR_SCANNER_VERSION=${{ matrix.sonar-version }}
+          export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
+          rm -rf $SONAR_SCANNER_HOME
+          mkdir -p $SONAR_SCANNER_HOME
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+          unzip $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+          rm $HOME/.sonar/sonar-scanner.zip
+          export PATH=$SONAR_SCANNER_HOME/bin:$PATH
+          export SONAR_SCANNER_OPTS="-server"
       - name: Run Analysis
-        uses: SonarSource/sonarcloud-github-action@v1.1
+        run: |
+          sonar-scanner \
+            -Dproject.settings=../sonar-project.properties
+            -Dsonar.login=$SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
