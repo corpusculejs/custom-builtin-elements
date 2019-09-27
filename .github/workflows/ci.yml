@@ -31,7 +31,8 @@ jobs:
         run: npm run test:coverage
         env:
           CI: true
-      - uses: actions/upload-artifact@master
+      - name: Save ${{ matrix.os }} code coverage
+        uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}.lcov
           path: .coverage/lcov.info
@@ -41,13 +42,23 @@ jobs:
     timeout-minutes: 20
     needs: testing
 
+    strategy:
+      matrix:
+        node-version: [10.x]
+
     steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
       - uses: actions/checkout@v1
-      - uses: actions/download-artifact@master
+      - name: Load windows-latest code coverage
+        uses: actions/download-artifact@master
         with:
           name: windows-latest.lcov
           path: .coverage/windows.lcov.info
-      - uses: actions/download-artifact@master
+      - name: Load macOS-latest code coverage
+        uses: actions/download-artifact@master
         with:
           name: macOS-latest.lcov
           path: .coverage/macOS.lcov.info
