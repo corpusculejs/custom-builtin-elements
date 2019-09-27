@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  ci:
+  testing:
     name: 'OS: ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
@@ -28,16 +28,29 @@ jobs:
       - name: Installation
         run: npm install
       - name: Run Test Suite
-        run: npm test
+        run: npm run test:coverage
         env:
           CI: true
+      - uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}.lcov
+          path: .coverage/lcov.info
   analysis:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: testing
 
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/download-artifact@master
+        with:
+          name: windows-latest.lcov
+          path: .coverage/windows.lcov.info
+      - uses: actions/download-artifact@master
+        with:
+          name: macOS-latest.lcov
+          path: .coverage/macOS.lcov.info
       - name: Run Sonar Scanner
         run: |
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
