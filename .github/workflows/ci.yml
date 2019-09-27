@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Install Sonar Scanner
+      - name: Run Sonar Scanner
         run: |
           export SONAR_SCANNER_VERSION=4.0.0.1744
           export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
@@ -48,9 +48,6 @@ jobs:
           rm $HOME/.sonar/sonar-scanner.zip
           export PATH=$SONAR_SCANNER_HOME/bin:$PATH
           export SONAR_SCANNER_OPTS="-server"
-      - name: Run Analysis
-        run: |
-          echo $SONAR_SCANNER_HOME
           sonar-scanner \
             -Dproject.settings=../sonar-project.properties
             -Dsonar.login=$SONAR_TOKEN
