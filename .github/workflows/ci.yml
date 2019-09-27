@@ -31,52 +31,20 @@ jobs:
         run: npm run test:coverage
         env:
           CI: true
-      - name: Save code coverage
-        uses: actions/upload-artifact@master
-        with:
-          name: ${{ matrix.os }}.lcov
-          path: .coverage/lcov.info
-  analysis:
-    name: SonarCloud Analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: testing
-
-    strategy:
-      matrix:
-        node-version: [10.x]
-
-    steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v1
-      - name: Load windows-latest code coverage
-        uses: actions/download-artifact@master
-        with:
-          name: windows-latest.lcov
-          path: .coverage/windows
-      - name: Load macOS-latest code coverage
-        uses: actions/download-artifact@master
-        with:
-          name: macOS-latest.lcov
-          path: .coverage/macOS
-      - name: Run Sonar Scanner
-        run: |
-          export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
-          rm -rf $SONAR_SCANNER_HOME
-          mkdir -p $SONAR_SCANNER_HOME
-          curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
-          unzip $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
-          rm $HOME/.sonar/sonar-scanner.zip
-          export PATH=$SONAR_SCANNER_HOME/bin:$PATH
-          export SONAR_SCANNER_OPTS="-server"
-          cd $GITHUB_WORKSPACE
-          sonar-scanner \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.javascript.lcov.reportPaths=.coverage/macOS/lcov.info,.coverage/windows/lcov.info
-        env:
-          SONAR_SCANNER_VERSION: 4.0.0.1744
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Run sonar-scanner
+          run: |
+            export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux
+            rm -rf $SONAR_SCANNER_HOME
+            mkdir -p $SONAR_SCANNER_HOME
+            curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+            unzip $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+            rm $HOME/.sonar/sonar-scanner.zip
+            export PATH=$SONAR_SCANNER_HOME/bin:$PATH
+            export SONAR_SCANNER_OPTS="-server"
+            cd $GITHUB_WORKSPACE
+            sonar-scanner \
+              -Dsonar.login=$SONAR_TOKEN
+          env:
+            SONAR_SCANNER_VERSION: 4.0.0.1744
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
