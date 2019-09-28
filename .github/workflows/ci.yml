@@ -27,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Installation
         run: npm install
-      - name: Run test suite
+      - name: Testing
         run: |
           npm run test:coverage
           node scripts/convertCoveragePaths.js .coverage/lcov.info
@@ -65,10 +65,13 @@ jobs:
         with:
           name: macOS-latest.lcov
           path: .coverage/macOS
-      - name: Run Sonar Scanner
+      - name: Prepare build
         run: |
+          npm install
           npm run build
           node scripts/convertCoveragePaths.js .coverage/macOs/lcov.info .coverage/windows/lcov.info --back
+      - name: Run Sonar Scanner
+        run: |
           sh scripts/sonar-scanner.sh
         env:
           SONAR_SCANNER_VERSION: 4.0.0.1744
