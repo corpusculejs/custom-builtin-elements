@@ -59,8 +59,8 @@ export function runForDescendants(root, check, callback, pierce = false) {
   const iter = document.createNodeIterator(
     root,
     NodeFilter.SHOW_ELEMENT,
-    node =>
-      check(node) || checkShadow(node, pierce)
+    matchingNode =>
+      check(matchingNode) || checkShadow(matchingNode, pierce)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_REJECT,
     null,
@@ -145,21 +145,3 @@ export function createElementObserver(element) {
   const observer = new MutationObserver(watchDOMChanges);
   observer.observe(element, {childList: true, subtree: true});
 }
-
-// Export function isConnectedToObservingNode(element) {
-//   if (isConnected(element)) {
-//     return true;
-//   }
-//
-//   let node = element;
-//
-//   while (node) {
-//     if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-//       return true;
-//     }
-//
-//     node = node.parentNode;
-//   }
-//
-//   return false;
-// }
