@@ -4,7 +4,9 @@
 [![Package size](https://badgen.net/bundlephobia/minzip/@corpuscule/custom-builtin-elements)](https://bundlephobia.com/result?p=@corpuscule/custom-builtin-elements)
 [![Build Status](https://travis-ci.com/corpusculejs/custom-builtin-elements.svg?branch=master)](https://travis-ci.com/corpusculejs/custom-builtin-elements)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Test Coverage](https://codecov.io/gh/corpusculejs/custom-builtin-elements/branch/master/graph/badge.svg)](https://codecov.io/gh/corpusculejs/custom-builtin-elements)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=corpusculejs_custom-builtin-elements&metric=coverage)](https://sonarcloud.io/dashboard?id=corpusculejs_custom-builtin-elements)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=corpusculejs_custom-builtin-elements&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=corpusculejs_custom-builtin-elements)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=corpusculejs_custom-builtin-elements&metric=bugs)](https://sonarcloud.io/dashboard?id=corpusculejs_custom-builtin-elements)
 
 This package is a polyfill for the [Customized Built-in Elements](https://html.spec.whatwg.org/multipage/custom-elements.html#customized-built-in-element)
 specification.
