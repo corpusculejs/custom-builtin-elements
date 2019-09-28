@@ -11,13 +11,5 @@
         "useBuiltIns": false
       }
     ]
-  ],
-  "plugins": [
-    [
-      "@babel/plugin-proposal-optional-chaining",
-      {
-        "loose": true
-      }
-    ]
   ]
 }

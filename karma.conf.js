@@ -18,7 +18,6 @@ module.exports = config => {
     basePath: '',
 
     plugins: [
-      require('karma-babel-preprocessor'),
       require('karma-chrome-launcher'),
       require('karma-coverage-istanbul-reporter'),
       require('karma-detect-browsers'),
@@ -38,8 +37,9 @@ module.exports = config => {
 
     files: [
       {pattern: '__tests__/polyfills.js', watched: false},
-      'lib/customElementsBase.js',
-      'lib/customBuiltInElements.js',
+      {pattern: 'src/customElementsBase.js', watched: false},
+      {pattern: '__tests__/sources.js', watched: false},
+      {pattern: 'src/index.js', watched: false, included: false},
       {pattern: '__tests__/index.js', watched: false},
     ],
 
@@ -47,7 +47,9 @@ module.exports = config => {
 
     preprocessors: {
       '__tests__/polyfills.js': ['rollup'],
-      'lib/customBuiltInElements.js': coverage ? ['babel'] : [],
+      '__tests__/sources.js': ['sourceRollup'],
+      'src/customElementsBase.js': ['sourceRollup'],
+      'src/index.js': ['sourceRollup'],
       '__tests__/index.js': ['rollup'],
     },
 
@@ -102,6 +104,23 @@ module.exports = config => {
       },
     },
 
+    customPreprocessors: {
+      sourceRollup: {
+        base: 'rollup',
+        options: {
+          plugins: [
+            require('rollup-plugin-node-resolve')(),
+            require('rollup-plugin-babel')({
+              babelrc: false,
+              ...babelrc,
+              plugins: coverage ? ['babel-plugin-istanbul'] : [],
+            }),
+          ],
+          treeshake: false,
+        },
+      },
+    },
+
     detectBrowsers: {
       postDetection(availableBrowsers) {
         // Firefox has all the features implemented as well as Chrome, so Chrome
@@ -127,13 +146,6 @@ module.exports = config => {
       },
       preferHeadless: true,
       usePhantomJS: false,
-    },
-
-    babelPreprocessor: {
-      options: {
-        plugins: ['babel-plugin-istanbul'],
-        sourceMap: 'inline',
-      },
     },
 
     singleRun: !watch,
