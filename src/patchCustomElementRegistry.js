@@ -1,17 +1,16 @@
 import {
   elementsRegistry,
-  elementsReversedRegistry,
   nativeConstructorRegistry,
   patchedPrototypesRegistry,
 } from './shared';
 import {
+  connect,
   defineProperties,
   getPrototypeChain,
   recognizeElementByIsAttribute,
   runForDescendants,
   setPrototypeOf,
   setup,
-  connect,
 } from './utils';
 
 const CERExceptionCommonText =
@@ -32,13 +31,13 @@ function patchCustomElementRegistry() {
           return;
         }
 
-        if (name in elementsRegistry) {
+        if (elementsRegistry.has(name)) {
           throw new Error(
             `${CERExceptionCommonText}: the name "${name}" has already been used with this registry`,
           );
         }
 
-        if (elementsReversedRegistry.has(constructor)) {
+        if (elementsRegistry.has(constructor)) {
           throw new Error(
             `${CERExceptionCommonText}: this constructor has already been used with this registry`,
           );
@@ -63,8 +62,7 @@ function patchCustomElementRegistry() {
           patchedPrototypesRegistry.set(firstChild, 0);
         }
 
-        elementsRegistry[name] = constructor;
-        elementsReversedRegistry.set(constructor, name);
+        elementsRegistry.set(name, constructor);
 
         const pattern = new RegExp(options.extends, 'i');
 
@@ -83,7 +81,7 @@ function patchCustomElementRegistry() {
     get: {
       configurable: true,
       value(name) {
-        return elementsRegistry[name] || get.call(customElements, name);
+        return elementsRegistry.get(name) || get.call(customElements, name);
       },
     },
     upgrade: {
@@ -101,9 +99,10 @@ function patchCustomElementRegistry() {
     whenDefined: {
       configurable: true,
       value(name) {
-        return name in elementsRegistry
-          ? Promise.resolve()
-          : whenDefined.call(customElements, name);
+        return Promise.race([
+          whenDefined.call(customElements, name),
+          elementsRegistry.whenDefined(name),
+        ]);
       },
     },
   });

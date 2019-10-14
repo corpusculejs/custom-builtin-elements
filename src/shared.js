@@ -1,22 +1,14 @@
+import {CustomBuiltInElementsRegistry} from './CustomBuiltInElementsRegistry';
+
 export const supportsNativeWebComponents =
   'ShadowRoot' in window &&
   !('ShadyCSS' in window && !window.ShadyCSS.nativeShadow);
 
 /**
- * Customized built-in elements registry. Contains "name => constructor"
- * associations.
- *
- * @type {Record<string, object>}
+ * Customized built-in elements registry.
+ * @see {CustomBuiltInElementsRegistry}
  */
-export const elementsRegistry = {};
-
-/**
- * A registry that contains the "constructor => name" associations for
- * customized built-in elements.
- *
- * @type {WeakMap<object, string>}
- */
-export const elementsReversedRegistry = new WeakMap();
+export const elementsRegistry = new CustomBuiltInElementsRegistry();
 
 /**
  * A registry that associates the user constructor with the specific tag. It is

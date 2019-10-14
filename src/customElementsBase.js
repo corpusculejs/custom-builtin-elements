@@ -7,6 +7,7 @@ if (!('customElements' in window)) {
     define: mock,
     get: mock,
     upgrade: mock,
-    whenDefined: mock,
+    // Promise that never resolves and then never wins the Promise.race.
+    whenDefined: () => new Promise(() => {}),
   };
 }

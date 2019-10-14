@@ -203,21 +203,32 @@ describe('custom-builtin-elements-polyfill', () => {
     });
 
     describe('whenDefined', () => {
-      it('waits until the component is defined', done => {
+      it('runs properly if the component declared before the waiting starts', done => {
         class Foo extends HTMLButtonElement {}
         const name = defineCBE(Foo, 'button');
 
         customElements.whenDefined(name).then(done);
       });
 
-      it('uses the native method if the element is not recognized', () => {
-        if (hasNativeCustomElementRegistry) {
-          pending();
-        }
+      it('waits properly when component declared after the waiting starts', done => {
+        const name = generateName();
 
-        expect(() => customElements.whenDefined('x-foo')).toThrowError(
-          'Not supported',
-        );
+        class Foo extends HTMLButtonElement {}
+        customElements.whenDefined(name).then(done);
+
+        setTimeout(() => defineCBE(Foo, 'button', name), 200);
+      });
+
+      it('waits properly if multiple listeners are added', done => {
+        const name = generateName();
+
+        class Foo extends HTMLButtonElement {}
+        const firstListener = customElements.whenDefined(name);
+        const secondListener = customElements.whenDefined(name);
+
+        Promise.all([firstListener, secondListener]).then(done);
+
+        setTimeout(() => defineCBE(Foo, 'button', name), 200);
       });
     });
   });
