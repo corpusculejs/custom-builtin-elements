@@ -93,6 +93,7 @@ module.exports = config => {
           include: ['node_modules/@open-wc/**', '__tests__/**'],
           ...babelrc,
           plugins: [
+            ...babelrc.plugins,
             '@babel/plugin-transform-instanceof',
             'babel-plugin-transform-async-to-promises',
           ],
@@ -113,7 +114,10 @@ module.exports = config => {
             require('rollup-plugin-babel')({
               babelrc: false,
               ...babelrc,
-              plugins: coverage ? ['babel-plugin-istanbul'] : [],
+              plugins: [
+                ...babelrc.plugins,
+                coverage && 'babel-plugin-istanbul',
+              ].filter(Boolean),
             }),
           ],
           treeshake: false,

@@ -51,8 +51,8 @@ function patchInnerHTML(proto) {
 function patchNativeMethods() {
   const {createElement} = document;
   document.createElement = function(_, options) {
-    if (options && options.is && elementsRegistry[options.is]) {
-      return new elementsRegistry[options.is]();
+    if (options && options.is && elementsRegistry.has(options.is)) {
+      return new (elementsRegistry.get(options.is))();
     }
 
     return createElement.apply(document, arguments);

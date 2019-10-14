@@ -2,7 +2,6 @@ import {
   $connectedCallback,
   $disconnectedCallback,
   elementsRegistry,
-  elementsReversedRegistry,
   lifecycleRegistry,
   supportsNativeWebComponents,
   upgradingRegistry,
@@ -81,11 +80,11 @@ export function runForDescendants(root, check, callback, pierce = false) {
 export function recognizeElementByIsAttribute(element) {
   const name = element.getAttribute('is');
 
-  return name && elementsRegistry[name];
+  return name && elementsRegistry.get(name);
 }
 
 export function recognizeElementByConstructor({constructor}) {
-  return elementsReversedRegistry.has(constructor) && constructor;
+  return elementsRegistry.has(constructor) && constructor;
 }
 
 export function setup(element) {

@@ -1,7 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 import {
   $attributeChangedCallback,
-  elementsReversedRegistry,
+  elementsRegistry,
   nativeConstructorNames,
   nativeConstructorRegistry,
   tagsRegistry,
@@ -32,7 +32,7 @@ function patchNativeConstructors() {
       constructor() {
         const {constructor} = this;
 
-        if (!elementsReversedRegistry.has(constructor)) {
+        if (!elementsRegistry.has(constructor)) {
           throw new TypeError('Illegal constructor');
         }
 

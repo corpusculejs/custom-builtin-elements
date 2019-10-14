@@ -36,6 +36,7 @@
   "homepage": "https://github.com/corpusculejs/custom-builtin-elements#readme",
   "devDependencies": {
     "@babel/core": "^7.6.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-transform-instanceof": "^7.5.5",
     "@babel/preset-env": "^7.6.0",
     "@open-wc/testing-helpers": "^1.2.1",
