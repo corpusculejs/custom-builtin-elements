@@ -2,6 +2,7 @@ import {
   elementsRegistry,
   nativeConstructorRegistry,
   patchedPrototypesRegistry,
+  tagsRegistry,
 } from './shared';
 import {
   connect,
@@ -63,6 +64,7 @@ function patchCustomElementRegistry() {
         }
 
         elementsRegistry.set(name, constructor);
+        tagsRegistry.set(constructor, options.extends);
 
         const pattern = new RegExp(options.extends, 'i');
 

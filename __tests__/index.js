@@ -44,6 +44,7 @@ describe('custom-builtin-elements-polyfill', () => {
       const foo = document.createElement('a', {is: name});
       expect(foo instanceof Foo).toBeTruthy();
       expect(foo instanceof HTMLAnchorElement).toBeTruthy();
+      expect(foo.nodeName).toBe('A');
     });
 
     it('applies user-defined constructor and prototype to a created element', () => {
