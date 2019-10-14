@@ -50,7 +50,9 @@ export class CustomBuiltInElementsRegistry {
     reversed.set(constructor, name);
 
     if (listeners[name]) {
-      listeners[name].forEach(listener => listener());
+      for (let i = 0, len = listeners[name].length; i < len; i++) {
+        listeners[name][i]();
+      }
       listeners[name] = null;
     }
   }
