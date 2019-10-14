@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://img.shields.io/npm/v/@corpuscule/custom-builtin-elements.svg)](https://www.npmjs.com/package/@corpuscule/custom-builtin-elements)
 [![Package size](https://badgen.net/bundlephobia/minzip/@corpuscule/custom-builtin-elements)](https://bundlephobia.com/result?p=@corpuscule/custom-builtin-elements)
-[![Build Status](https://travis-ci.com/corpusculejs/custom-builtin-elements.svg?branch=master)](https://travis-ci.com/corpusculejs/custom-builtin-elements)
+[![CI Status](https://github.com/corpusculejs/custom-builtin-elements/workflows/CI/badge.svg)](https://github.com/corpusculejs/custom-builtin-elements/actions)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=corpusculejs_custom-builtin-elements&metric=coverage)](https://sonarcloud.io/dashboard?id=corpusculejs_custom-builtin-elements)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=corpusculejs_custom-builtin-elements&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=corpusculejs_custom-builtin-elements)
