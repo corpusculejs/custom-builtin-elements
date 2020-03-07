@@ -18,15 +18,9 @@ to support this part of the Custom Elements spec, as well as IE 11 and Edge do
 not have this feature on board. This polyfill aims to fill this gap and provide
 support for this feature for all browsers that miss it.
 
-You may have a question: why choose this polyfill if there already is a
-well-known and popular [`@ungap/custom-elements-builtin`](https://github.com/ungap/custom-elements-builtin)?
-Unfortunately, it has some problems that make it hard to use. For example, with
-the `@ungap/custom-elements-builtin` you cannot use class constructors or create new
-elements with the `new` operator.
+Differently from [@ungap/custom-elements-builtin](https://github.com/ungap/custom-elements-builtin), this polyfills allow the usage of the `constructor`, which is apparently a [caveat](https://github.com/ungap/custom-elements-builtin#constructor-caveat) of that alternative library.
 
-This polyfill provides the solution for all of these issues and makes it
-possible to use the customized built-in elements in all browsers that lack
-support for them: Safari, Edge, IE 11.
+This polyfill provides a solution that issue and makes it possible to use the customized built-in elements in all browsers that lack support for them: Safari, Edge, IE 11.
 
 ## Installation
 
